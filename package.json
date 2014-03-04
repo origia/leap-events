@@ -1,0 +1,27 @@
+{
+  "name": "origia",
+  "version": "0.1.0",
+  "description": "Leap motion events",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/origia/leap-events.git"
+  },
+  "keywords": [
+    "leap-motion"
+  ],
+  "author": "Daniel Perez, Tadayuki Onishi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/origia/leap-events/issues"
+  },
+  "homepage": "https://github.com/origia/leap-events",
+  "devDependencies": {
+    "grunt": "^0.4.2",
+    "grunt-nodemon": "^0.2.0",
+    "grunt-concurrent": "^0.4.3"
+  }
+}
