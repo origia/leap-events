@@ -1,8 +1,5 @@
-var Leap = require('leapjs');
-var controller = new Leap.Controller();
+var LeapManager = require('./leap-manager');
 
-controller.on('frame', function(frame) {
-  console.log(frame);
-});
+var manager = new LeapManager();
+manager.start();
 
-controller.connect();

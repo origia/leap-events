@@ -1,12 +1,11 @@
+/**
+ * Wrapper class around Leap.this.Controller
+**/
+
 var Leap = require('leapjs');
 var _ = require('underscore');
 
-var started = false;
-var controller = new Leap.Controller();
-
-var events = {};
-
-var options = {
+var defaults = {
   host: '127.0.0.1',
   port: 6437,
   enableGestures: true,
@@ -15,47 +14,61 @@ var options = {
 };
 
 var LeapManager = function(overrides) {
-  _.extend(options, overrides);
+  this.options = _.extend({}, defaults, overrides);
+  this.controller = new Leap.Controller(this.options);
 };
 
 _.extend(LeapManager.prototype, {
+  events: {},
+  started: false,
+
   start: function() {
-    if (started) {
+    if (this.started) {
       return;
     }
-    controller.connect();
-    started = true;
+    this.controller.connect();
+    this.controller.on('frame', this.handleFrame);
+    this.started = true;
   },
 
   stop: function() {
-    if (!started) {
+    if (!this.started) {
       return;
     }
-    controller.disconnect();
-    started = false;
+    this.controller.disconnect();
+    this.started = false;
+  },
+
+  isRunning: function() {
+    return this.started;
   },
 
   on: function(eventName, callback) {
-    events[eventName] = callback;
+    this.events[eventName] = callback;
   },
 
   off: function(eventName) {
     if (eventName) {
-      delete events[eventName];
+      delete this.events[eventName];
     } else {
       // remove all events when called without arguments
-      events = {};
+      this.events = {};
     }
   },
 
   trigger: function(eventName) {
-    var callback = events[eventName];
+    var callback = this.events[eventName];
     if (!callback) {
       return;
     }
     var args = Array.prototype.slice.call(arguments, 1);
     callback(args);
+  },
+
+  handleFrame: function(frame) {
+    console.log(frame);
   }
-};
+});
+
 
 module.exports = LeapManager;
