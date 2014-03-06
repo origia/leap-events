@@ -53,8 +53,8 @@ _.extend(LeapManager.prototype, {
     if (!callback) {
       return;
     }
-    var arguments = Array.prototype.slice.call(arguments, 1);
-    callback(arguments);
+    var args = Array.prototype.slice.call(arguments, 1);
+    callback(args);
   }
 };
 
