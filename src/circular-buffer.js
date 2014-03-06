@@ -78,6 +78,7 @@ _.extend(CircularBuffer.prototype, {
     return this._container;
   },
 
+  // worst case O(n)
   takeWhile: function (predicate, fromLast) {
     var retArray = [],
       index = this._currentIndex;
@@ -86,11 +87,11 @@ _.extend(CircularBuffer.prototype, {
     }
 
     while (predicate(this._container[index])) {
-      retArray.unshift(this._container[index]);
+      retArray.push(this._container[index]);
       index = this._prevIndex(index);
     }
 
-    return fromLast ? retArray.reverse() : retArray;
+    return fromLast ? retArray : retArray.reverse();
   }
 });
 
