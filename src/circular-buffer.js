@@ -70,7 +70,7 @@ _.extend(CircularBuffer.prototype, {
     if (_.isUndefined(n) ||  n <= 0) {
       throw new RangeError("argument should be defined and strictly positive");
     }
-    var start = this._indexFromEnd(n);
+    var start = this._indexFromEnd(n) + 1;
     return this._container.slice(start, this._currentIndex + 1);
   },
 
@@ -78,11 +78,11 @@ _.extend(CircularBuffer.prototype, {
     return this._container;
   },
 
-  takeWhile: function (predicate, reversed) {
+  takeWhile: function (predicate, fromLast) {
     var retArray = [],
       index = this._currentIndex;
-    if (_.isUndefined(reversed)) {
-      reversed = true;
+    if (_.isUndefined(fromLast)) {
+      fromLast = true;
     }
 
     while (predicate(this._container[index])) {
@@ -90,7 +90,7 @@ _.extend(CircularBuffer.prototype, {
       index = this._prevIndex(index);
     }
 
-    return reversed ? retArray.reverse() : retArray;
+    return fromLast ? retArray.reverse() : retArray;
   }
 });
 
