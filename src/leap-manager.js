@@ -13,21 +13,42 @@ var defaults = {
   useAllplugins: false
 };
 
+var baseEvents = [
+  'blur', 'connect', 'deviceConnected', 'deviceDisconnected',
+  'disconnect', 'focus', 'gesture', 'protocol'
+];
+
 var LeapManager = function(overrides) {
   this.options = _.extend({}, defaults, overrides);
   this.controller = new Leap.Controller(this.options);
+  this._initBaseEvents();
 };
 
 _.extend(LeapManager.prototype, {
   events: {},
   started: false,
 
+  _initBaseEvents: function() {
+    var self = this;
+    var makeTrigger = function(eventName) {
+      return function(args) {
+        self.trigger.apply(self, Array.prototype.concat([eventName], args));
+      }
+    };
+    _.each(baseEvents, function(eventName) {
+      self.controller.on(eventName, makeTrigger(eventName));
+    });
+  },
+
   start: function() {
     if (this.started) {
       return;
     }
+    var self = this;
     this.controller.connect();
-    this.controller.on('frame', this.handleFrame);
+    this.controller.on('frame', function(frame) {
+      self.handleFrame(frame);
+    });
     this.started = true;
   },
 
@@ -61,12 +82,11 @@ _.extend(LeapManager.prototype, {
     if (!callback) {
       return;
     }
-    var args = Array.prototype.slice.call(arguments, 1);
-    callback(args);
+    callback.apply(this, Array.prototype.slice.call(arguments, 1));
   },
 
   handleFrame: function(frame) {
-    console.log(frame);
+    this.trigger('frame', frame);
   }
 });
 
