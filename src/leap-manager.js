@@ -4,18 +4,19 @@
 
 "use strict";
 
-var _    = require('underscore')
-  , Leap = require('leapjs')
+var _               = require('underscore')
+  , Leap            = require('leapjs')
+  , GestureDetector = require('./gesture-detector')
 
 
-var defaults = { host: '127.0.0.1'
+  , defaults = { host: '127.0.0.1'
                , port: 6437
                , enableGestures: true
                , frameEventName: 'deviceFrame'
                , useAllplugins: false
                }
 
-var baseEvents = [ 'blur'
+  , baseEvents = [ 'blur'
                  , 'connect'
                  , 'deviceConnected'
                  , 'deviceDisconnected'
@@ -34,6 +35,7 @@ var LeapManager = function (overrides) {
 _.extend(LeapManager.prototype, {
   events: {}
 , started: false
+, gestureDetector: new GestureDetector()
 
 , _initBaseEvents: function () {
     var self = this
@@ -96,6 +98,7 @@ _.extend(LeapManager.prototype, {
 
 , handleFrame: function (frame) {
     this.trigger('frame', frame)
+    this.gestureDetector.processFrame(frame)
   }
 })
 

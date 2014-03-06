@@ -7,7 +7,8 @@
 
 var _ = require('underscore')
 
-var defaults = { capacity: 200
+
+  , defaults = { capacity: 200
                }
 
 var CircularBuffer = function (overrides) {
