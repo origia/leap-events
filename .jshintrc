@@ -1,0 +1,11 @@
+{
+  "laxcomma": true,
+  "node": true,
+  "indent": 2,
+  "asi": true,
+  "newcap": true,
+  "noempty": true,
+  "plusplus": false,
+  "white": true,
+  "trailing": true
+}
