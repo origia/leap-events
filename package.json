@@ -27,6 +27,7 @@
     "grunt-contrib-watch": "^0.5.3"
   },
   "dependencies": {
-    "leapjs": "^0.4.1"
+    "leapjs": "^0.4.1",
+    "underscore": "^1.6.0"
   }
 }
