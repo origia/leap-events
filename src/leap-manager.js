@@ -31,7 +31,8 @@ _.extend(LeapManager.prototype, {
   started: false,
 
   _initBaseEvents: function () {
-    var self = this,
+    var
+      self = this,
       makeTrigger = function (eventName) {
         return function (args) {
           self.trigger.apply(self, Array.prototype.concat([eventName], args));
