@@ -23,7 +23,7 @@ _.extend(CircularBuffer.prototype, {
 , _currentIndex:  -1
 
 , _nextIndex: function (i) {
-    return i < this.capacity() ? i + 1 : 0
+    return i + 1 < this.capacity() ? i + 1 : 0
   }
 
 , _prevIndex: function (i) {
@@ -58,6 +58,7 @@ _.extend(CircularBuffer.prototype, {
     return index
   }
 
+  // O(1)
 , last: function (n) {
     n = n || 0
     if (n < 0) {
@@ -66,19 +67,31 @@ _.extend(CircularBuffer.prototype, {
     return this._container[this._indexFromEnd(n)]
   }
 
-, nLast: function (n) {
-    if (_.isUndefined(n) ||  n <= 0) {
+  // case O(n)
+, take: function (n) {
+    if (_.isUndefined(n) ||  n < 0) {
       throw new RangeError("argument should be defined and strictly positive")
     }
-    var start = this._indexFromEnd(n) + 1
-    return this._container.slice(start, this._currentIndex + 1)
+
+    var start = this._indexFromEnd(n - 1)
+    var retArray
+    if (n >= this._currentLength) {
+      retArray = this._container.slice(0, this._currentLength)
+    } else if (this._currentIndex + 1 < start) {
+      var firstPart = this._container.slice(start, this.capacity())
+      var secondPart = this._container.slice(0, this._currentIndex + 1)
+      retArray = firstPart.concat(secondPart)
+    } else {
+      retArray = this._container.slice(start, this._currentIndex + 1)
+    }
+    return retArray.reverse()
   }
 
 , container: function () {
     return this._container
   }
 
-  // worst case O(n)
+  // worst case O(N)
 , takeWhile: function (predicate, fromLast) {
     var retArray = []
       , index = this._currentIndex
