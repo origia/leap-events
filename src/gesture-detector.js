@@ -38,10 +38,8 @@ _.extend(GestureDetector.prototype, {
   }
 
 , _logStateChange: function (previous, next) {
-    logger.debug('state changed from ' +
-        previous.fingersCount() +
-        ' to ' + next.fingersCount() + ' fingers'
-      )
+    logger.debug('state changed from %d to %d fingers',
+      previous.fingersCount(), next.fingersCount())
   }
 
 , _setCurrentState: function (newState) {

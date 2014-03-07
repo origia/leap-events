@@ -70,7 +70,7 @@ _.extend(CircularBuffer.prototype, {
   // case O(n)
 , take: function (n) {
     if (_.isUndefined(n) ||  n < 0) {
-      throw new RangeError("argument should be defined and strictly positive")
+      throw new RangeError("argument should be defined and positive")
     }
 
     var start = this._indexFromEnd(n - 1)
