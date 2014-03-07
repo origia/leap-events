@@ -27,15 +27,17 @@ var _               = require('underscore')
                  ]
 
 var LeapManager = function (overrides) {
+  _.bindAll(this, 'trigger', 'handleFrame')
   this.options = _.extend({}, defaults, overrides)
   this.controller = new Leap.Controller(this.options)
+  this.gestureDetector =  new GestureDetector()
+  this.gestureDetector.setOnEventListener(this.trigger)
   this._initBaseEvents()
 }
 
 _.extend(LeapManager.prototype, {
   events: {}
 , started: false
-, gestureDetector: new GestureDetector()
 
 , _initBaseEvents: function () {
     var self = this
@@ -57,9 +59,7 @@ _.extend(LeapManager.prototype, {
     }
     var self = this
     this.controller.connect()
-    this.controller.on('frame', function (frame) {
-      self.handleFrame(frame)
-    })
+    this.controller.on('frame', this.handleFrame)
     this.started = true
   }
 
