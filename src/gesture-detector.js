@@ -6,6 +6,7 @@
 
 var _              = require('underscore')
   , CircularBuffer = require('./circular-buffer')
+  , FingersState   = require('./fingers-state')
 
 
   , defaults = { bufferSize: 300
@@ -20,28 +21,38 @@ var GestureDetector = function (overrides) {
 }
 
 _.extend(GestureDetector.prototype, {
-  _currentState: { fingersNumber: 0
-                 , fingers: []
-                 }
+  _currentState: new FingersState()
 
 , processFrame: function (frame) {
     var state = this._getState(frame)
-    this._updateCurrentState(frame, state)
+    this._updateCurrentState(state)
+    this.buffer.append({ frame: frame
+                       , state: state
+                       })
   }
 
 , _getState: function (frame) {
     var fingers = frame.fingers
-    return { fingersNumber: fingers.length
-           , fingers: fingers
-           }
+    return new FingersState(fingers)
   }
 
-, _updateCurrentState: function (frame, nextState) {
+, _setCurrentState: function (newState) {
+    this._currentState = newState
+  }
 
-    this._currentState = nextState
-    this.buffer.append({ frame: frame
-                       , state: this._currentState
-                       })
+, _needsStateChange: function (newState) {
+    var previousData = this.buffer.take(this.options.stateChangeThreshold)
+      , previousStates = _(previousData).pluck('state')
+    return _(previousStates).all(function (state) {
+      return state.equals(newState)
+    })
+  }
+
+, _updateCurrentState: function (newState) {
+    if (this._currentState.equals(newState) ||
+        this._needsStateChange(newState)) {
+      this._setCurrentState(newState)
+    }
   }
 })
 
