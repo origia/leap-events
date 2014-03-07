@@ -9,6 +9,7 @@ var _              = require('underscore')
 
 
   , defaults = { bufferSize: 300
+               , stateChangeThreshold: 10
                }
 
 var GestureDetector = function (overrides) {
@@ -19,8 +20,28 @@ var GestureDetector = function (overrides) {
 }
 
 _.extend(GestureDetector.prototype, {
-  processFrame: function (frame) {
-    this.buffer.append(frame)
+  _currentState: { fingersNumber: 0
+                 , fingers: []
+                 }
+
+, processFrame: function (frame) {
+    var state = this._getState(frame)
+    this._updateCurrentState(frame, state)
+  }
+
+, _getState: function (frame) {
+    var fingers = frame.fingers
+    return { fingersNumber: fingers.length
+           , fingers: fingers
+           }
+  }
+
+, _updateCurrentState: function (frame, nextState) {
+
+    this._currentState = nextState
+    this.buffer.append({ frame: frame
+                       , state: this._currentState
+                       })
   }
 })
 
