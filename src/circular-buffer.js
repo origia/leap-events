@@ -6,6 +6,7 @@
 "use strict";
 
 var _ = require('underscore')
+  , logger = require('./logger')
 
 
   , defaults = { capacity: 200
@@ -99,12 +100,32 @@ _.extend(CircularBuffer.prototype, {
       fromLast = true
     }
 
-    while (predicate(this._container[index])) {
+    while (this._container[index] && predicate(this._container[index])) {
       retArray.push(this._container[index])
       index = this._prevIndex(index)
     }
 
     return fromLast ? retArray : retArray.reverse()
+  }
+
+, skipAndTakeWhile: function (skipPredicate, takePredicate) {
+    var retArray = []
+      , index = this._currentIndex
+
+    takePredicate = takePredicate || function (elem) {
+      return !skipPredicate(elem)
+    }
+
+    while (this._container[index] && skipPredicate(this._container[index])) {
+      index = this._prevIndex(index)
+    }
+
+    while (this._container[index] && takePredicate(this._container[index])) {
+      retArray.push(this._container[index])
+      index = this._prevIndex(index)
+    }
+
+    return retArray
   }
 })
 
