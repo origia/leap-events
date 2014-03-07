@@ -13,6 +13,7 @@ var _              = require('underscore')
   , defaults = { bufferSize: 300
                  // increases stability but slows down latency
                , stateChangeThreshold: 30
+               , pauseMinFrameNumber: 5
                }
 
   , fingerEvents = { 1: 'oneFingerMove'
@@ -32,7 +33,7 @@ var GestureDetector = function (overrides) {
 _.extend(GestureDetector.prototype, {
   _previousState: null
 , _currentState: new FingersState()
-, _onEvent: null
+, _listener: null
 
 , processFrame: function (frame) {
     var state = this._getState(frame)
@@ -60,7 +61,13 @@ _.extend(GestureDetector.prototype, {
   }
 
 , setOnEventListener: function (listener) {
-    this._onEvent = listener
+    this._listener = listener
+  }
+
+, _callListener: function () {
+    if (this._listener) {
+      this._listener.apply(this._listener, arguments)
+    }
   }
 
 , _needsStateChange: function (newState) {
@@ -74,9 +81,9 @@ _.extend(GestureDetector.prototype, {
     var state = this._currentState
     var fingersNum = state.fingersCount()
     if (fingersNum > 0) {
-      this._onEvent('fingerMove', state.fingers)
+      this._callListener('fingerMove', state)
       if (fingersNum in fingerEvents) {
-        this._onEvent(fingerEvents[fingersNum], state.fingers)
+        this._callListener(fingerEvents[fingersNum], state)
       }
     }
     if (hasChanged && this._previousState.fingersCount() === 5) {
@@ -88,7 +95,20 @@ _.extend(GestureDetector.prototype, {
     var states = this.buffer.skipAndTakeWhile(function (state) {
       return state.fingersCount() !== 5
     })
-    if (states.length === 0) return
+    if (states.length < this.options.pauseMinFrameNumber) return
+
+    var positions = _(states).map(function (state) {
+      return state.averagePosition()
+    })
+
+    var totalZDiff = 0
+    for (var i = 1; i < positions.length; i++) {
+      totalZDiff += positions[i].z - positions[i - 1].z
+    }
+    var meanZDiff = totalZDiff / positions.length
+    _(positions).each(function (p) { console.log(p.x) })
+    logger.debug(totalZDiff)
+    logger.debug(meanZDiff)
   }
 
 , _updateCurrentState: function (newState) {
