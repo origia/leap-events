@@ -11,6 +11,7 @@ var _              = require('underscore')
 
 
   , defaults = { bufferSize: 300
+                 // increases stability but slows down latency
                , stateChangeThreshold: 30
                }
 
