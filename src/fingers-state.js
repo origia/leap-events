@@ -4,7 +4,8 @@
 
 "use strict";
 
-var _ = require('underscore')
+var _      = require('underscore')
+  , logger = require('./logger')
 
 var FingersState = function (fingers) {
   this.fingers = fingers || []
@@ -12,13 +13,13 @@ var FingersState = function (fingers) {
 
 _.extend(FingersState.prototype, {
   equals: function (other) {
-    if (this.count() != other.count) {
+    if (this.fingersCount() != other.fingersCount()) {
       return false
     }
-    return _.isEmpty(_(this.fingersIds()).difference(other.fingersIds()))
+    return _.isEmpty(_.difference(this.fingerIds(), other.fingerIds()))
   }
 
-, count: function () {
+, fingersCount: function () {
     return this.fingers.length
   }
 

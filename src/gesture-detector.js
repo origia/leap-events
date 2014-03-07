@@ -7,10 +7,11 @@
 var _              = require('underscore')
   , CircularBuffer = require('./circular-buffer')
   , FingersState   = require('./fingers-state')
+  , logger         = require('./logger')
 
 
   , defaults = { bufferSize: 300
-               , stateChangeThreshold: 10
+               , stateChangeThreshold: 30
                }
 
 var GestureDetector = function (overrides) {
@@ -36,7 +37,17 @@ _.extend(GestureDetector.prototype, {
     return new FingersState(fingers)
   }
 
+, _logStateChange: function (previous, next) {
+    logger.debug('state changed from ' +
+        previous.fingersCount() +
+        ' to ' + next.fingersCount() + ' fingers'
+      )
+  }
+
 , _setCurrentState: function (newState) {
+    if (!this._currentState.equals(newState)) {
+      this._logStateChange(this._currentState, newState)
+    }
     this._currentState = newState
   }
 
