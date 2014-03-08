@@ -52,7 +52,7 @@ _.extend(FrameState.prototype, {
     x = x / FrameState.leapFrameSize.width * FrameState.screenSize.width
     y = y / FrameState.leapFrameSize.height * FrameState.screenSize.height
     return { x: x
-           , y: FrameState.screenSize - y
+           , y: FrameState.screenSize.height - y
            }
   }
 
