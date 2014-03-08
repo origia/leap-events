@@ -4,13 +4,14 @@
 
 "use strict";
 
-var _              = require('underscore')
-  , CircularBuffer = require('./circular-buffer')
-  , FrameState     = require('./frame-state')
-  , logger         = require('./logger')
+var _               = require('underscore')
+  , CircularBuffer  = require('./circular-buffer')
+  , FrameState      = require('./frame-state')
+  , logger          = require('./logger')
+  , GestureAnalyzer =  require('./gesture-analyzer')
 
 
-  , defaults = { bufferSize: 300
+  , defaults = { bufferSize: 1000
                  // increases stability but slows down latency
                , stateChangeThreshold: 30
                , pauseMinFrameNumber: 5
@@ -28,10 +29,12 @@ var GestureDetector = function (overrides) {
   this.buffer = new CircularBuffer({
     capacity: this.options.bufferSize
   })
+  this.analyzer = new GestureAnalyzer()
 }
 
 _.extend(GestureDetector.prototype, {
-  _previousState: null
+  _beforPrevState: null
+, _previousState: null
 , _currentState: new FrameState()
 , _listener: null
 
@@ -50,8 +53,9 @@ _.extend(GestureDetector.prototype, {
 , _setCurrentState: function (newState) {
     if (!this._currentState.equals(newState)) {
       this._logStateChange(this._currentState, newState)
+      this._beforPrevState = this._previousState
+      this._previousState = this._currentState
     }
-    this._previousState = this._currentState
     this._currentState = newState
   }
 
@@ -81,8 +85,9 @@ _.extend(GestureDetector.prototype, {
         this._callListener(fingerEvents[fingersNum], state)
       }
     }
-    if (hasChanged && this._previousState.fingersCount() === 5) {
-      this._triggerPause()
+    if (hasChanged) {
+      this.analyzer.analyzeFrames(
+        this._beforPrevState, this._previousState, state, this.buffer)
     }
   }
 

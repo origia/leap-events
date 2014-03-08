@@ -31,6 +31,10 @@ _.extend(FrameState.prototype, {
     return _.isEmpty(_.difference(this.fingerIds(), other.fingerIds()))
   }
 
+, frameId: function () {
+    return this.frame.id
+  }
+
 , fingersCount: function () {
     return this.fingers.length
   }
@@ -39,12 +43,20 @@ _.extend(FrameState.prototype, {
     return _.pluck(this.fingers, 'id')
   }
 
-, screenPosition: function () {
+, position2D: function () {
     if (this.fingersCount() ===  0) {
       return null
     }
     var position = _(this.fingers).first().tipPosition
-      , x = position[0]
+    return [position[0], position[1]]
+  }
+
+, screenPosition: function () {
+    var position = this.position2D()
+    if (position === null) {
+      return null
+    }
+    var x = position[0]
       , y = position[1]
 
     x += FrameState.leapFrameSize.width / 2

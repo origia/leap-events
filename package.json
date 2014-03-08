@@ -29,6 +29,7 @@
   "dependencies": {
     "leapjs": "^0.4.1",
     "underscore": "^1.6.0",
-    "winston": "^0.7.2"
+    "winston": "^0.7.2",
+    "mathjs": "^0.18.1"
   }
 }

@@ -92,6 +92,13 @@ _.extend(CircularBuffer.prototype, {
     return this._container
   }
 
+, each: function (callback) {
+    for (var i = this._currentIndex, j = 0; j < this._currentLength;
+      i = this._prevIndex(i), j++) {
+      callback(this._container[i])
+    }
+  }
+
   // worst case O(N)
 , takeWhile: function (predicate, fromLast) {
     var retArray = []
