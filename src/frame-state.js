@@ -59,6 +59,18 @@ _.extend(FrameState.prototype, {
     return position[1]
   }
 
+, getZ: function () {
+    if (this.fingersCount() ===  0) {
+      return null
+    }
+    var position = _(this.fingers).first().tipPosition
+    return position[2]
+  }
+
+, getHand: function () {
+    return this.frame.hands[0]
+  }
+
 , position2D: function () {
     var x = this.getX()
       , y = this.getY()

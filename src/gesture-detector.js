@@ -96,26 +96,6 @@ _.extend(GestureDetector.prototype, {
     }
   }
 
-, _triggerPause: function () {
-    var states = this.buffer.skipAndTakeWhile(function (state) {
-      return state.fingersCount() !== 5
-    })
-    if (states.length < this.options.pauseMinFrameNumber) return
-
-    var positions = _(states).map(function (state) {
-      return state.averagePosition()
-    })
-
-    var totalZDiff = 0
-    for (var i = 1; i < positions.length; i++) {
-      totalZDiff += positions[i].z - positions[i - 1].z
-    }
-    var meanZDiff = totalZDiff / positions.length
-    // _(positions).each(function (p) { console.log(p.x) })
-    // logger.debug(totalZDiff)
-    // logger.debug(meanZDiff)
-  }
-
 , _updateCurrentState: function (newState) {
     var isSame = this._currentState.equals(newState)
     if (isSame || this._needsStateChange(newState)) {

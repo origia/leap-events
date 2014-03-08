@@ -13,6 +13,7 @@ var _        = require('underscore')
                , surroundMinFrame: 20
                , surroundDistanceThreshold: 50
                , musicValueThreshold: 50
+               , pauseDistanceThreshold: 30
                }
 
 
@@ -29,6 +30,10 @@ _.extend(GestureAnalyzer.prototype, {
       return this.analyzeTwoFingers(beforePrevState.frameId(),
        previousState.frameId(), buffer)
     }
+    if (previousState.fingersCount() === 5) {
+      return this.analyzeFiveFingers(beforePrevState.frameId(),
+       previousState.frameId(), buffer)
+    }
   }
 
 , getStates: function (startId, endId, buffer) {
@@ -40,7 +45,7 @@ _.extend(GestureAnalyzer.prototype, {
 , analyzeTwoFingers: function (startId, endId, buffer) {
     var states = this.getStates(startId, endId, buffer)
       , evt
-    logger.debug("frames number: " + states.length)
+    logger.debug("two fingers frames number: %d", states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     if (states.length >= this.options.surroundMinFrame) {
       evt = this.checkForSurround(states)
@@ -48,6 +53,27 @@ _.extend(GestureAnalyzer.prototype, {
     }
     evt = this.checkMusic(states)
     if (evt) return evt
+    return {}
+  }
+
+, analyzeFiveFingers: function (startId, endId, buffer) {
+    var states = this.getStates(startId, endId, buffer)
+      , evt
+    logger.debug("five fingers frames number: %d", states.length)
+    if (states.length < this.options.gestureMinFrameNumber) return {}
+    evt = this.checkPause(states)
+    if (evt) return evt
+    return {}
+  }
+
+, checkPause: function (states) {
+    var totalZDiff = 0
+    for (var i = 1; i < states.length; i++) {
+      if (states[i].getHand() && states[i - 1].getHand()) {
+        totalZDiff += states[i].getHand().palmPosition[2] - states[i - 1].getHand().palmPosition[2]
+      }
+    }
+    if (totalZDiff > this.options.pauseDistanceThreshold) return { pause: null }
   }
 
 , checkForSurround: function (states) {

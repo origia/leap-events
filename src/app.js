@@ -13,6 +13,11 @@ manager.on('surround', function (states) {
 manager.on('music', function () {
   console.log('music')
 })
+
+manager.on('pause', function () {
+  console.log('pause')
+})
+
 manager.start()
 
 module.exports = { LeapManager: require('./leap-manager')
