@@ -1,5 +1,5 @@
 {
-  "name": "origia",
+  "name": "leap-events",
   "version": "0.1.0",
   "description": "Leap motion events",
   "main": "main.js",
