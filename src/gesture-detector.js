@@ -6,7 +6,7 @@
 
 var _              = require('underscore')
   , CircularBuffer = require('./circular-buffer')
-  , FingersState   = require('./fingers-state')
+  , FrameState     = require('./frame-state')
   , logger         = require('./logger')
 
 
@@ -32,19 +32,14 @@ var GestureDetector = function (overrides) {
 
 _.extend(GestureDetector.prototype, {
   _previousState: null
-, _currentState: new FingersState()
+, _currentState: new FrameState()
 , _listener: null
 
 , processFrame: function (frame) {
-    var state = this._getState(frame)
+    var state = new FrameState(frame)
     var hasChanged = this._updateCurrentState(state)
     this._triggerEvents(hasChanged)
     this.buffer.append(state)
-  }
-
-, _getState: function (frame) {
-    var fingers = frame.fingers
-    return new FingersState(fingers)
   }
 
 , _logStateChange: function (previous, next) {
@@ -106,9 +101,9 @@ _.extend(GestureDetector.prototype, {
       totalZDiff += positions[i].z - positions[i - 1].z
     }
     var meanZDiff = totalZDiff / positions.length
-    _(positions).each(function (p) { console.log(p.x) })
-    logger.debug(totalZDiff)
-    logger.debug(meanZDiff)
+    // _(positions).each(function (p) { console.log(p.x) })
+    // logger.debug(totalZDiff)
+    // logger.debug(meanZDiff)
   }
 
 , _updateCurrentState: function (newState) {

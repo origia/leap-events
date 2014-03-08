@@ -7,11 +7,23 @@
 var _      = require('underscore')
   , logger = require('./logger')
 
-var FingersState = function (fingers) {
-  this.fingers = fingers || []
+
+var FrameState = function (frame) {
+  this.frame = frame || {}
+  this.fingers = this.frame.fingers || []
 }
 
-_.extend(FingersState.prototype, {
+_.extend(FrameState, {
+  screenSize: { width: 1024
+              , height: 768
+              }
+, leapFrameSize: { width: 400
+                 , height: 400
+                 }
+, yMinValue: 40
+})
+
+_.extend(FrameState.prototype, {
   equals: function (other) {
     if (this.fingersCount() != other.fingersCount()) {
       return false
@@ -25,6 +37,23 @@ _.extend(FingersState.prototype, {
 
 , fingerIds: function () {
     return _.pluck(this.fingers, 'id')
+  }
+
+, screenPosition: function () {
+    if (this.fingersCount() ===  0) {
+      return null
+    }
+    var position = _(this.fingers).first().tipPosition
+      , x = position[0]
+      , y = position[1]
+
+    x += FrameState.leapFrameSize.width / 2
+    y -= FrameState.yMinValue
+    x = x / FrameState.leapFrameSize.width * FrameState.screenSize.width
+    y = y / FrameState.leapFrameSize.height * FrameState.screenSize.height
+    return { x: x
+           , y: y
+           }
   }
 
 , averagePosition: function () {
@@ -48,4 +77,4 @@ _.extend(FingersState.prototype, {
   }
 })
 
-module.exports = FingersState
+module.exports = FrameState

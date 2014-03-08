@@ -14,6 +14,7 @@ var _               = require('underscore')
                , enableGestures: true
                , frameEventName: 'deviceFrame'
                , useAllplugins: false
+
                }
 
   , baseEvents = [ 'blur'
