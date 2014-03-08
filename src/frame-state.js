@@ -43,21 +43,34 @@ _.extend(FrameState.prototype, {
     return _.pluck(this.fingers, 'id')
   }
 
-, position2D: function () {
+, getX: function () {
     if (this.fingersCount() ===  0) {
       return null
     }
     var position = _(this.fingers).first().tipPosition
-    return [position[0], position[1]]
+    return position[0]
+  }
+
+, getY: function () {
+    if (this.fingersCount() ===  0) {
+      return null
+    }
+    var position = _(this.fingers).first().tipPosition
+    return position[1]
+  }
+
+, position2D: function () {
+    var x = this.getX()
+      , y = this.getY()
+    if (x === null || y === null) return null
+    return [x, y]
   }
 
 , screenPosition: function () {
-    var position = this.position2D()
-    if (position === null) {
-      return null
-    }
-    var x = position[0]
-      , y = position[1]
+    var x = this.getX()
+      , y = this.getY()
+
+    if (x === null || y === null) return null
 
     x += FrameState.leapFrameSize.width / 2
     y -= FrameState.yMinValue

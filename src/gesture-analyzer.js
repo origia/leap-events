@@ -7,11 +7,12 @@
 var _        = require('underscore')
   , jStat    = require('jStat').jStat
   , geometry = require('./geometry')
-  , logger          = require('./logger')
+  , logger   = require('./logger')
 
   , defaults = { gestureMinFrameNumber: 10
                , surroundMinFrame: 20
                , surroundDistanceThreshold: 50
+               , musicValueThreshold: 50
                }
 
 
@@ -38,12 +39,15 @@ _.extend(GestureAnalyzer.prototype, {
 
 , analyzeTwoFingers: function (startId, endId, buffer) {
     var states = this.getStates(startId, endId, buffer)
+      , evt
     logger.debug("frames number: " + states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     if (states.length >= this.options.surroundMinFrame) {
-      var evt = this.checkForSurround(states)
+      evt = this.checkForSurround(states)
       if (evt) return evt
     }
+    evt = this.checkMusic(states)
+    if (evt) return evt
   }
 
 , checkForSurround: function (states) {
@@ -64,6 +68,24 @@ _.extend(GestureAnalyzer.prototype, {
     if (minDistance < this.options.surroundSquareDistanceThreshold) {
       return { surround: states.slice(0, minIndex) }
     }
+  }
+
+, checkMusic: function (states) {
+    var baseY  = states[0].getY()
+      , threshold = this.options.musicValueThreshold
+      , i = 0
+    for (; i < states.length && states[i].getY() - baseY < threshold; i++) ;
+    if (i >= states.length) return
+    for (; i < states.length && states[i].getY() >= baseY; i++) baseY = states[i].getY()
+    for (; i < states.length && baseY - states[i].getY() < threshold; i++) ;
+    if (i >= states.length) return
+    for (; i < states.length && states[i].getY() <= baseY; i++) baseY = states[i].getY()
+    for (; i < states.length && states[i].getY() - baseY < threshold; i++) ;
+    if (i >= states.length) return
+    for (; i < states.length && states[i].getY() >= baseY; i++) baseY = states[i].getY()
+    for (; i < states.length && baseY - states[i].getY() < threshold; i++) ;
+    if (i >= states.length || baseY - states[i].getY() < threshold) return
+    return { music: null }
   }
 })
 
