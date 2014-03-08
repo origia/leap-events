@@ -86,8 +86,13 @@ _.extend(GestureDetector.prototype, {
       }
     }
     if (hasChanged) {
-      this.analyzer.analyzeFrames(
-        this._beforPrevState, this._previousState, state, this.buffer)
+      var events = this.analyzer.analyzeFrames(this._beforPrevState,
+        this._previousState, state, this.buffer)
+      for (var eventName in events) {
+        if (events.hasOwnProperty(eventName)) {
+          this._callListener(eventName, events[eventName])
+        }
+      }
     }
   }
 

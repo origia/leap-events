@@ -34,7 +34,7 @@ _.extend(GestureAnalyzer.prototype, {
     var states = buffer.skipAndTakeWhile(function (state) {
       return state.frameId() !== endId
     }, function (state) { return state.frameId() !== startId })
-    logger.debug("length: " + states.length)
+    logger.debug("frames number: " + states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     if (states.length >= this.options.surroundMinFrame) {
       var evt = this.checkForSurround(states)
