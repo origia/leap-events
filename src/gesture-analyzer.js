@@ -101,7 +101,7 @@ _.extend(GestureAnalyzer.prototype, {
 , checkForSurround: function (states) {
     var statesToCheck = states.slice(this.options.surroundMinFrame)
       , startPoint = states[0].position2D()
-      , minDistance = 100000
+      , minDistance = 10000000
       , minIndex = 0
 
     for (var i = 0; i < statesToCheck.length; i++) {
@@ -114,7 +114,10 @@ _.extend(GestureAnalyzer.prototype, {
       }
     }
     if (minDistance < this.options.surroundSquareDistanceThreshold) {
-      return { surround: states.slice(0, minIndex) }
+      var retStates = _(states.slice(0, minIndex)).reject(function (state) {
+        return state.fingersCount() === 0
+      })
+      if (retStates.length > 0) return { surround:  retStates }
     }
   }
 
