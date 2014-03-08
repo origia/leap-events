@@ -17,6 +17,7 @@ var _        = require('underscore')
                , buyDistanceThreshold: 50
                , buyTimeThreshold: 100 * 1000 * 1000
                , fingerDistanceThreshold: 50
+               , zoomDistanceThreshold: 200
                }
 
 
@@ -24,6 +25,8 @@ var GestureAnalyzer = function (overrides) {
   this.options = _.extend({}, defaults, overrides)
   this.options.surroundSquareDistanceThreshold =
     this.options.surroundDistanceThreshold * this.options.surroundDistanceThreshold
+  this.options.zoomSquareDistanceThreshold =
+    this.options.zoomDistanceThreshold * this.options.zoomDistanceThreshold
 }
 
 _.extend(GestureAnalyzer.prototype, {
@@ -51,6 +54,8 @@ _.extend(GestureAnalyzer.prototype, {
     logger.debug("two fingers frames number: %d", states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     var xDiff = Math.abs(states[0].getX() - states[0].fingers[1].tipPosition[0])
+    evt = this.checkZoom(states)
+    if (evt) return evt
     if (states[0].handsCount() >= 2 || xDiff > this.options.fingerDistanceThreshold) {
       return this.checkBuy(states)
     }
@@ -71,6 +76,30 @@ _.extend(GestureAnalyzer.prototype, {
     evt = this.checkPause(states)
     if (evt) return evt
     return {}
+  }
+
+, checkZoom: function (states) {
+    var firstState, i
+      , threshold = this.options.zoomSquareDistanceThreshold
+    for (i = 0; states.length && states[i].fingersCount() < 2; i++) ;
+    firstState = states[i]
+
+    var initialDistance = geometry.squareDistance(
+      firstState.fingers[0].tipPosition, firstState.fingers[1].tipPosition)
+
+    for (i = 1; i < states.length; i++) {
+      var state = states[i]
+      if (state.fingersCount() < 2) continue
+
+      var distance = geometry.squareDistance(
+        state.fingers[0].tipPosition, state.fingers[1].tipPosition)
+
+      if (distance - initialDistance > threshold) {
+        return { zoomOut: distance - initialDistance }
+      } else if (initialDistance - distance > threshold) {
+        return { zoomIn: initialDistance - distance }
+      }
+    }
   }
 
 , checkPause: function (states) {

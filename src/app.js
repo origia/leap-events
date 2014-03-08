@@ -23,6 +23,14 @@ manager.on('buy', function () {
   console.log('buy')
 })
 
+manager.on('zoomIn', function () {
+  console.log('zoomIn')
+})
+
+manager.on('zoomOut', function () {
+  console.log('zoomOut')
+})
+
 manager.start()
 
 module.exports = { LeapManager: require('./leap-manager')
