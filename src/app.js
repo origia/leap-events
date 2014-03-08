@@ -2,9 +2,13 @@
 
 var LeapManager = require('./leap-manager')
 
+var i = 0
 var manager = new LeapManager()
+manager.on('twoFingersMove', function (state) {
+  console.log("move: " + i++)
+})
 manager.on('surround', function (states) {
-  console.log(states)
+  console.log("suround: " + i++)
 })
 manager.start()
 
