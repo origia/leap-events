@@ -14,6 +14,8 @@ var _        = require('underscore')
                , surroundDistanceThreshold: 50
                , musicValueThreshold: 50
                , pauseDistanceThreshold: 30
+               , buyDistanceThreshold: 50
+               , buyTimeThreshold: 100 * 1000 * 1000
                }
 
 
@@ -47,6 +49,9 @@ _.extend(GestureAnalyzer.prototype, {
       , evt
     logger.debug("two fingers frames number: %d", states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
+    if (states[0].handsCount() === 2) {
+      return this.checkBuy(states)
+    }
     if (states.length >= this.options.surroundMinFrame) {
       evt = this.checkForSurround(states)
       if (evt) return evt
@@ -74,6 +79,20 @@ _.extend(GestureAnalyzer.prototype, {
       }
     }
     if (totalZDiff > this.options.pauseDistanceThreshold) return { pause: null }
+  }
+
+, checkBuy: function (states) {
+    var startY   = states[0].getY()
+      , starTime = states[0].getTime()
+
+    for (var i = 0; i < states.length; i++) {
+      if (startY - states[i].getY() > this.options.buyDistanceThreshold) {
+        if (starTime - states[i].getTime() < this.options.buyTimeThreshold)
+          return { 'buy': null }
+        else break
+      }
+    }
+    return {}
   }
 
 , checkForSurround: function (states) {

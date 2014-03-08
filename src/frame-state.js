@@ -9,8 +9,9 @@ var _      = require('underscore')
 
 
 var FrameState = function (frame) {
-  this.frame = frame || {}
+  this.frame   = frame || {}
   this.fingers = this.frame.fingers || []
+  this.hands   = this.frame.hands || []
 }
 
 _.extend(FrameState, {
@@ -35,12 +36,20 @@ _.extend(FrameState.prototype, {
     return this.frame.id
   }
 
+, handsCount: function () {
+    return this.hands.length
+  }
+
 , fingersCount: function () {
     return this.fingers.length
   }
 
 , fingerIds: function () {
     return _.pluck(this.fingers, 'id')
+  }
+
+, getTime: function () {
+    return this.frame.timestamp
   }
 
 , getX: function () {

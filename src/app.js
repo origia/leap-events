@@ -18,6 +18,10 @@ manager.on('pause', function () {
   console.log('pause')
 })
 
+manager.on('buy', function () {
+  console.log('buy')
+})
+
 manager.start()
 
 module.exports = { LeapManager: require('./leap-manager')
