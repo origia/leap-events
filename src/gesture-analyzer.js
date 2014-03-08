@@ -18,6 +18,7 @@ var _        = require('underscore')
                , buyTimeThreshold: 100 * 1000 * 1000
                , fingerDistanceThreshold: 50
                , zoomDistanceThreshold: 200
+               , forBackDistanceThreshold: 50
                }
 
 
@@ -43,9 +44,12 @@ _.extend(GestureAnalyzer.prototype, {
   }
 
 , getStates: function (startId, endId, buffer) {
-    return buffer.skipAndTakeWhile(function (state) {
+    var states = buffer.skipAndTakeWhile(function (state) {
       return state.frameId() !== endId
     }, function (state) { return state.frameId() !== startId })
+    return _(states).reject(function (state) {
+      return state.fingersCount() === 0
+    })
   }
 
 , analyzeTwoFingers: function (startId, endId, buffer) {
@@ -60,7 +64,7 @@ _.extend(GestureAnalyzer.prototype, {
       return this.checkBuy(states)
     }
     if (states.length >= this.options.surroundMinFrame) {
-      evt = this.checkForSurround(states)
+      evt = this.checkSurround(states)
       if (evt) return evt
     }
     evt = this.checkMusic(states)
@@ -112,6 +116,7 @@ _.extend(GestureAnalyzer.prototype, {
     if (totalZDiff > this.options.pauseDistanceThreshold) return { pause: null }
   }
 
+
 , checkBuy: function (states) {
     logger.debug('checkBuy')
     var startY   = states[0].getY()
@@ -120,14 +125,22 @@ _.extend(GestureAnalyzer.prototype, {
     for (var i = 0; i < states.length; i++) {
       if (startY - states[i].getY() > this.options.buyDistanceThreshold) {
         if (starTime - states[i].getTime() < this.options.buyTimeThreshold)
-          return { 'buy': null }
+          return { buy: null }
         else break
       }
     }
     return {}
   }
 
-, checkForSurround: function (states) {
+, checkForward: function (states) {
+    var i
+      , initialPosition = states[0].position2D()
+    for (i = 1; i < states.length; i++) {
+    }
+
+  }
+
+, checkSurround: function (states) {
     var statesToCheck = states.slice(this.options.surroundMinFrame)
       , startPoint = states[0].position2D()
       , minDistance = 10000000
@@ -168,6 +181,5 @@ _.extend(GestureAnalyzer.prototype, {
     return { music: null }
   }
 })
-
 
 module.exports = GestureAnalyzer
