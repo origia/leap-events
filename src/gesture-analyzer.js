@@ -30,10 +30,14 @@ _.extend(GestureAnalyzer.prototype, {
     }
   }
 
-, analyzeTwoFingers: function (startId, endId, buffer) {
-    var states = buffer.skipAndTakeWhile(function (state) {
+, getStates: function (startId, endId, buffer) {
+    return buffer.skipAndTakeWhile(function (state) {
       return state.frameId() !== endId
     }, function (state) { return state.frameId() !== startId })
+  }
+
+, analyzeTwoFingers: function (startId, endId, buffer) {
+    var states = this.getStates(startId, endId, buffer)
     logger.debug("frames number: " + states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     if (states.length >= this.options.surroundMinFrame) {
@@ -58,7 +62,7 @@ _.extend(GestureAnalyzer.prototype, {
       }
     }
     if (minDistance < this.options.surroundSquareDistanceThreshold) {
-      return { 'surround': states.slice(0, minIndex) }
+      return { surround: states.slice(0, minIndex) }
     }
   }
 })
