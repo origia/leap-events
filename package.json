@@ -2,7 +2,7 @@
   "name": "leap-events",
   "version": "0.1.0",
   "description": "Leap motion events",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
