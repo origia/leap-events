@@ -6,6 +6,7 @@ var manager = new LeapManager()
 manager.on('twoFingersMove', function (state) {
   // console.log("move: " + i++)
 })
+
 manager.on('surround', function (states) {
   console.log("suround")
 })

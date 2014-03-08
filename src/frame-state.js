@@ -40,6 +40,10 @@ _.extend(FrameState.prototype, {
     return this.hands.length
   }
 
+, fingers: function () {
+    return this.fingers
+  }
+
 , fingersCount: function () {
     return this.fingers.length
   }

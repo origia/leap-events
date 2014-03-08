@@ -10,12 +10,13 @@ var _        = require('underscore')
   , logger   = require('./logger')
 
   , defaults = { gestureMinFrameNumber: 10
-               , surroundMinFrame: 20
+               , surroundMinFrame: 30
                , surroundDistanceThreshold: 50
                , musicValueThreshold: 50
                , pauseDistanceThreshold: 30
                , buyDistanceThreshold: 50
                , buyTimeThreshold: 100 * 1000 * 1000
+               , fingerDistanceThreshold: 50
                }
 
 
@@ -49,7 +50,8 @@ _.extend(GestureAnalyzer.prototype, {
       , evt
     logger.debug("two fingers frames number: %d", states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
-    if (states[0].handsCount() === 2) {
+    var xDiff = Math.abs(states[0].getX() - states[0].fingers[1].tipPosition[0])
+    if (states[0].handsCount() >= 2 || xDiff > this.options.fingerDistanceThreshold) {
       return this.checkBuy(states)
     }
     if (states.length >= this.options.surroundMinFrame) {
@@ -82,6 +84,7 @@ _.extend(GestureAnalyzer.prototype, {
   }
 
 , checkBuy: function (states) {
+    logger.debug('checkBuy')
     var startY   = states[0].getY()
       , starTime = states[0].getTime()
 
