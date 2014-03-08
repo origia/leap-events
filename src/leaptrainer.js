@@ -120,6 +120,7 @@ var LeapTrainer = {};
     Class.prototype       = prototype;    //Populate our constructed prototype object
     Class.prototype.constructor = Class;      //Enforce the constructor to be what we expect
     //Class.extend        = arguments.callee; //And make this class extendable
+    Class.extend          = this
     Class.overidden       = prop;       //And store the list of overridden fields
 
     return Class;
