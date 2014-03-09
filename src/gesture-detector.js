@@ -33,7 +33,7 @@ var GestureDetector = function (overrides) {
 }
 
 _.extend(GestureDetector.prototype, {
-  _beforPrevState: null
+  _beforePrevState: null
 , _previousState: null
 , _currentState: new FrameState()
 , _listener: null
@@ -53,7 +53,7 @@ _.extend(GestureDetector.prototype, {
 , _setCurrentState: function (newState) {
     if (!this._currentState.equals(newState)) {
       this._logStateChange(this._currentState, newState)
-      this._beforPrevState = this._previousState
+      this._beforePrevState = this._previousState
       this._previousState = this._currentState
     }
     this._currentState = newState
@@ -86,7 +86,7 @@ _.extend(GestureDetector.prototype, {
       }
     }
     if (hasChanged) {
-      var events = this.analyzer.analyzeFrames(this._beforPrevState,
+      var events = this.analyzer.analyzeFrames(this._beforePrevState,
         this._previousState, state, this.buffer)
       for (var eventName in events) {
         if (events.hasOwnProperty(eventName)) {

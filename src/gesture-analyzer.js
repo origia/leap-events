@@ -18,6 +18,7 @@ var _        = require('underscore')
                , buyTimeThreshold: 100 * 1000 * 1000
                , fingerDistanceThreshold: 50
                , zoomDistanceThreshold: 200
+               , swipeDistanceThreshold: 200
                }
 
 
@@ -32,17 +33,23 @@ var GestureAnalyzer = function (overrides) {
 _.extend(GestureAnalyzer.prototype, {
   analyzeFrames: function (beforePrevState, previousState,
     currentState, buffer) {
-    if (beforePrevState === null) return {}
 
-    var states = this.getStates(beforePrevState.frameId(),
-       previousState.frameId(), buffer)
+    var evt = {}
 
-    if (previousState.fingersCount() === 2) {
-      return this.analyzeTwoFingers(states)
+    if (beforePrevState !== null) {
+      var befPrevFrameId = beforePrevState.frameId()
+        , prevFrameId    = previousState.frameId()
+
+      _.extend(evt, this.checkSwipe(befPrevFrameId, prevFrameId, buffer))
+
+      if (previousState.fingersCount() === 2) {
+        _.extend(evt, this.analyzeTwoFingers(befPrevFrameId, prevFrameId, buffer))
+      }
+      if (previousState.fingersCount() === 5) {
+        _.extend(evt,  this.analyzeFiveFingers(befPrevFrameId, prevFrameId, buffer))
+      }
     }
-    if (previousState.fingersCount() === 5) {
-      return this.analyzeFiveFingers(states)
-    }
+    return evt
   }
 
 , getStates: function (startId, endId, buffer) {
@@ -54,8 +61,24 @@ _.extend(GestureAnalyzer.prototype, {
     })
   }
 
-, analyzeTwoFingers: function (states) {
-    var evt
+, checkSwipe: function (startId, endId, buffer) {
+    var states = this.getStates(startId, endId, buffer)
+    var totalXDiff = 0
+    for (var i = 1; i < states.length; i++) {
+      if (states[i].getHand() && states[i - 1].getHand()) {
+        totalXDiff += states[i].getHand().palmPosition[0] - states[i - 1].getHand().palmPosition[0]
+      }
+    }
+    if (totalXDiff > this.options.swipeDistanceThreshold) {
+      return { swipeLeft: states[0] }
+    } else if (-totalXDiff > this.options.swipeDistanceThreshold) {
+      return { swipeRight: states[0] }
+    }
+  }
+
+, analyzeTwoFingers: function (startId, endId, buffer) {
+    var states = this.getStates(startId, endId, buffer)
+      , evt
     logger.debug("two fingers frames number: %d", states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     var xDiff = Math.abs(states[0].getX() - states[0].fingers[1].tipPosition[0])
@@ -73,8 +96,9 @@ _.extend(GestureAnalyzer.prototype, {
     return {}
   }
 
-, analyzeFiveFingers: function (states) {
-    var evt
+, analyzeFiveFingers: function (startId, endId, buffer) {
+    var states = this.getStates(startId, endId, buffer)
+      , evt
     logger.debug("five fingers frames number: %d", states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     evt = this.checkPause(states)

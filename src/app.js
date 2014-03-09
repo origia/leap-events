@@ -31,6 +31,14 @@ manager.on('zoomOut', function () {
   console.log('zoomOut')
 })
 
+manager.on('swipeLeft', function () {
+  console.log('swipeLeft')
+})
+
+manager.on('swipeRight', function () {
+  console.log('swipeRight')
+})
+
 manager.start()
 
 module.exports = { LeapManager: require('./leap-manager')
