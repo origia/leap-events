@@ -18,7 +18,6 @@ var _        = require('underscore')
                , buyTimeThreshold: 100 * 1000 * 1000
                , fingerDistanceThreshold: 50
                , zoomDistanceThreshold: 200
-               , forBackDistanceThreshold: 50
                }
 
 
@@ -33,13 +32,16 @@ var GestureAnalyzer = function (overrides) {
 _.extend(GestureAnalyzer.prototype, {
   analyzeFrames: function (beforePrevState, previousState,
     currentState, buffer) {
-    if (previousState.fingersCount() === 2) {
-      return this.analyzeTwoFingers(beforePrevState.frameId(),
+    if (beforePrevState === null) return {}
+
+    var states = this.getStates(beforePrevState.frameId(),
        previousState.frameId(), buffer)
+
+    if (previousState.fingersCount() === 2) {
+      return this.analyzeTwoFingers(states)
     }
     if (previousState.fingersCount() === 5) {
-      return this.analyzeFiveFingers(beforePrevState.frameId(),
-       previousState.frameId(), buffer)
+      return this.analyzeFiveFingers(states)
     }
   }
 
@@ -52,9 +54,8 @@ _.extend(GestureAnalyzer.prototype, {
     })
   }
 
-, analyzeTwoFingers: function (startId, endId, buffer) {
-    var states = this.getStates(startId, endId, buffer)
-      , evt
+, analyzeTwoFingers: function (states) {
+    var evt
     logger.debug("two fingers frames number: %d", states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     var xDiff = Math.abs(states[0].getX() - states[0].fingers[1].tipPosition[0])
@@ -72,9 +73,8 @@ _.extend(GestureAnalyzer.prototype, {
     return {}
   }
 
-, analyzeFiveFingers: function (startId, endId, buffer) {
-    var states = this.getStates(startId, endId, buffer)
-      , evt
+, analyzeFiveFingers: function (states) {
+    var evt
     logger.debug("five fingers frames number: %d", states.length)
     if (states.length < this.options.gestureMinFrameNumber) return {}
     evt = this.checkPause(states)
@@ -130,14 +130,6 @@ _.extend(GestureAnalyzer.prototype, {
       }
     }
     return {}
-  }
-
-, checkForward: function (states) {
-    var i
-      , initialPosition = states[0].position2D()
-    for (i = 1; i < states.length; i++) {
-    }
-
   }
 
 , checkSurround: function (states) {
